@@ -19,7 +19,7 @@ The algorithms were benchmarked on a 10 million randomly generated floating poin
   3. Intro-sort with lomuto branchless - 4534 ms
   4. std::sort - 3043 ms
 
-All codes were tested on AMD Ryzen 7 3700x machine with base clock of 3.59 ghz
+All codes were tested on AMD Ryzen 7 3700x machine with base clock of 3.59 Ghz.
 The intro-sort algorithm implemented are optimised only for numeric values. FOr the rest, the code works but could be sub-par to std::sort.
 
   
