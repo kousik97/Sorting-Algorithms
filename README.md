@@ -1,5 +1,5 @@
-# Sorting-Algorithms
-Optimised generic sorting algorithms - C++
+# Sort & Selection Algorithms
+Optimised generic sort and selection algorithms - C++
 
 Cohort of algorithms implemented : 
   1. Insertion Sort
