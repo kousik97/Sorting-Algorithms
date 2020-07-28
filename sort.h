@@ -336,25 +336,3 @@ I binary_search(I begin, I end, T key) {
     }
     return cop;
 }
-
-template <typename I>
-I OS(I begin, I end, std::ptrdiff_t order){
-    std::ptrdiff_t size = end - begin;
-    while(size > SELECT_THRESHOLD){
-        I pivot = small(begin,end-1);
-        pivot = hoare_partition(begin,end,pivot);
-        std::ptrdiff_t  num = pivot-begin;
-        if(num+1 == order){
-            return pivot;
-        } else if(num+1 > order){
-            end = pivot;
-        } else{
-            begin = pivot + 1;
-            order -= (num + 1);
-        }
-        size = end - begin;
-    }
-    introsort(begin,end);
-    return begin + order - 1;
-}
-
