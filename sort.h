@@ -10,6 +10,9 @@
 #include<cassert>
 
 static const size_t SORT_THRESHOLD = 16;
+static const size_t SELECT_THRESHOLD = 128;
+
+
 
 template <typename T>
 inline int logarithm(T val){
@@ -82,7 +85,7 @@ void unguarded_linear_insert(I last) {
 
 template<typename I>
 void insertion_sort(I first, I last) {
-    for (auto i = first + 1; i < last; ++i) {
+    for (I i = first + 1; i < last; ++i) {
         auto val = *i;
         if (val < *first) {
             size_t n = i - first - 1;
@@ -174,7 +177,7 @@ template <typename I>
 I hoare_partition(I begin, I end, I pivot){
     --end;
     auto val = *pivot;
-    *begin = *pivot;
+    std::swap(*begin,*pivot);
     I first = begin, last = end;
     for(;;){
         ++first;
@@ -198,6 +201,59 @@ I hoare_partition(I begin, I end, I pivot){
     return first;
 }
 
+//Bubblesort
+template <typename I>
+void bubblesort(I begin, I end){
+    for(I it  = end; it > begin + 1; it--){
+        auto max = *begin;
+        for(I it2 = begin+1; it2 < it; it2++){
+            auto val = *it2;
+            it2[-1] = val;
+            if(max < val){
+                it2[-1] = max;
+                max = val;
+            }
+            //bool is_smaller = max < val;
+            //it2[-1] = is_smaller ? max : val;
+            //max = is_smaller ? val : max;
+        }
+        it[-1] = max;
+    }
+}
+
+//Bubblesort2 - Requires atleast two element
+template <typename I>
+void bubblesort2(I begin, I end){
+    auto _x = *begin;
+    auto _y = *(begin+1);
+    if(_y < _x) {std::swap(_x,_y);}
+    for(I it = end;it > begin + 1;it--){
+        auto x = _x;
+        auto y = _y;
+        for(I it2 = begin+2; it2 < it;it2++){
+            auto z = *it2;
+            /*bool is_smaller = y <= z;
+            auto w = is_smaller ? y : z;
+            y = is_smaller ? z : y;
+            is_smaller = x <= z;
+            *(it2-2) = (is_smaller ? x : z);
+            x = is_smaller ? w : x;*/
+            auto w = z;
+            if(y < z){
+                w = y;
+                y = z;
+            }
+            it2[-2] = z;
+            if(x < z){
+                it2[-2] = x;
+                x = w;
+            }
+        }
+        it[-1] = y;
+        it[-2] = x;
+    }
+}
+
 //Main quicksort function
 template <typename I>
 void quicksort(I begin, I end){
@@ -216,10 +272,10 @@ void heapify(I begin, I end, std::ptrdiff_t i){
     std::ptrdiff_t size = (end-begin);
     std::ptrdiff_t l = 2*i + 1 >= size ? i : 2*i + 1;
     std::ptrdiff_t r = 2*i + 2 >= size ? i : 2*i + 2;
-    std::ptrdiff_t largest = *(begin + l) > *(begin + r) ? l : r;
-    largest = *(begin + i) > *(begin + largest) ? i : largest;
+    std::ptrdiff_t largest = begin[l] > begin[r] ? l : r;
+    largest = begin[i] > begin[largest] ? i : largest;
     if(largest!=i){
-        std::swap(*(begin+i),*(begin+largest));
+        std::swap(begin[i],begin[largest]);
         heapify(begin,end,largest);
     }
 }
@@ -238,6 +294,8 @@ void heapsort(I begin, I end){
         heapify(begin,it,0);
     }
 }
+
+
 
 //Introsort sub function
 template <typename I>
@@ -262,3 +320,41 @@ void introsort(I begin, I end){
     int max_depth = 2 * logarithm((end-begin));
     introsort_main(begin,end,max_depth);
 }
+
+template <typename I, typename T>
+I binary_search(I begin, I end, T key) {
+    I cop = end;
+    while (std::distance(begin, end) > 0) {
+        I mid = begin + (end-begin)/2;
+        if (*mid == key) {
+            return mid;
+        } else if (*mid > key) {
+            end = mid;
+        } else {
+            begin = mid + 1;
+        }
+    }
+    return cop;
+}
+
+template <typename I>
+I OS(I begin, I end, std::ptrdiff_t order){
+    std::ptrdiff_t size = end - begin;
+    while(size > SELECT_THRESHOLD){
+        I pivot = small(begin,end-1);
+        pivot = hoare_partition(begin,end,pivot);
+        std::ptrdiff_t  num = pivot-begin;
+        if(num+1 == order){
+            return pivot;
+        } else if(num+1 > order){
+            end = pivot;
+        } else{
+            begin = pivot + 1;
+            order -= (num + 1);
+        }
+        size = end - begin;
+    }
+    introsort(begin,end);
+    return begin + order - 1;
+}
+
